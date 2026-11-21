@@ -1,0 +1,36 @@
+## Deployment
+https://todo-app-react-nl4v.onrender.com
+
+## Discussion
+- I decided to use the same React todo app that I used in exercise 1.15.
+- I chose Render because I wanted to try this service. Previously I had experience with Vercel for Next.js apps.
+- I had to modify the Dockerfile because I didn't want to deploy the Vite development server.
+
+### Dockerfile
+``` dockerfile
+# used official node image for convinience 
+FROM node:18-alpine 
+# decided to keep with the same port as with Vite dev.
+EXPOSE 5173
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN npm install 
+# previously it was just CMD with npm run dev -- --host
+RUN npm run build 
+
+RUN npm install -g serve
+
+CMD ["serve","-s","-l","5173","dist"]
+```
+
+### Renderer
+First, I created a new Web Service project on Render. According to the docs this is the way to deploy a Docker image.
+When I pointed it to the repository, it gave me an error saying it needs to be an amd64 image. I built mine image on Mac M1, so I had to rebuild the image with this command:
+``` bash
+docker build -t todo-react --platform linux/amd64 .
+```
+After that I pushed it to registry and redeployed the app.
+It worked.
